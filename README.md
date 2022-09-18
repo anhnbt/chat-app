@@ -1,14 +1,28 @@
-#
+# Hướng dẫn run với Docker
 
+## Cách 1: run từ Dockerfile
+### Tạo Image
 
-docker build -t appchat .
+```
+docker build -t chat-app .
+```
 
-docker run --name mongodb -d -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=AzureDiamond -e MONGO_INITDB_ROOT_PASSWORD=hunter2 -e MONGO_INITDB_DATABASE=simple-chat mongo
-
-## Network
-docker run --name mongodb -d --network chatapp -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=AzureDiamond -e MONGO_INITDB_ROOT_PASSWORD=hunter2 -e MONGO_INITDB_DATABASE=simple-chat mongo
-
+### Docker Network
+Kiểm tra network:
+```
 docker network ls
-docker network create --driver bridge chatapp
+```
 
+Nếu chưa có thì tạo network:
+
+```
+docker network create --driver bridge chat-app
+```
+
+### Run image
+```
+docker run --name mongodb -d --network chat-app -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME=anhnbt -e MONGO_INITDB_ROOT_PASSWORD=KhoaiTay@2019 -e MONGO_INITDB_DATABASE=chat-app mongo
+```
+
+## Cách 2: run Docker Compose
 docker-compose up

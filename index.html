@@ -42,15 +42,17 @@
         });
         function getMessages() {
             $.get('http://localhost:3000/messages', (data) => {
-                $('#messages').append(`
-                    <h4>${data.name}</h4>
-                    <p>${data.message}</p>
-                `);
+                console.log('data', data);
+                for (const message of data) {
+                    $('#messages').append(`
+                        <li><strong>${message.name}</strong>: ${message.message}</li>
+                    `);
+                }
             });
         }
         function addMessages(message) {
             $('#messages').append(`
-            <li>${message.name}: ${message.message}</li>
+            <li><strong>${message.name}</strong>: ${message.message}</li>
             `);
             window.scrollTo(0, document.body.scrollHeight);
         }
