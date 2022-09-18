@@ -28,7 +28,7 @@ app.post('/messages', (req, res) => {
     console.log('POST messages', message);
     message.save((err) => {
         if (err) {
-            sendStatus(500);
+            res.sendStatus(500);
         } else {
             io.emit('message', req.body);
             res.sendStatus(200);
