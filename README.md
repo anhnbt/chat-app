@@ -28,3 +28,7 @@ docker run --name mongodb -d -p 27017:27017 -e MONGO_INITDB_DATABASE=chat-app mo
 
 ## Cách 2: run Docker Compose
 docker-compose up
+
+## Cau hinh cors
+
+npm i cors

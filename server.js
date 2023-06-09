@@ -5,8 +5,17 @@ const server = http.createServer(app);
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const io = new Server(server);
+const cors = require('cors');
+const io = new Server(server, {
+    cors: {
+        origin: "http://localhost:4200",
+        methods: ["GET", "POST"]
+    }
+});
 
+app.use(cors({
+    origin: 'http://localhost:4200'
+}));
 app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
