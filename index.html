@@ -36,16 +36,16 @@
                 e.preventDefault();
                 sendMessage({
                     name: $('#name').val(),
-                    message: $('#message').val()
+                    email: $('#message').val()
                 });
             });
         });
         function getMessages() {
-            $.get('http://localhost:3000/messages', (data) => {
+            $.get('http://localhost:3001/api/v1/users', (data) => {
                 console.log('data', data);
                 for (const message of data) {
                     $('#messages').append(`
-                        <li><strong>${message.name}</strong>: ${message.message}</li>
+                        <li><strong>${message.name}</strong>: ${message.email}</li>
                     `);
                 }
             });
@@ -59,7 +59,7 @@
         function sendMessage(message) {
             $('#name').val('');
             $('#message').val('');
-            $.post('http://localhost:3000/messages', message);
+            $.post('http://localhost:3001/api/v1/users', message);
         }
         var socket = io();
         socket.on('message', addMessages);

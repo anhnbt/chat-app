@@ -1,59 +1,37 @@
-const express = require('express');
-const { createServer } = require('http');
-const { Server } = require('socket.io');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const cors = require('cors');
+require('dotenv').config();
+const {createServer} = require('http');
+const express = require('express'); // library express
+const bodyParser = require('body-parser'); // turns response into usable format
+const cors = require('cors'); // allow or disallow cross-site communication
+const fs = require('fs');
+const helmet = require('helmet'); // create header that protect from attacks (security)
+const morgan = require('morgan'); // add some logging capabilities
+const path = require('path');
+
+const {Server} = require('socket.io');
+// socket configuration
+// const {WebSockets} = require('./src/utils/WebSockets');
+// routes
+var indexRouter = require("./routes");
+var usersRouter = require("./routes/users");
 
 const app = express();
-const port = process.env.PORT || 3000;
-const httpServer = createServer(app);
-const io = new Server(httpServer, {
-    cors: {
-        origin: "http://localhost:4200",
-        methods: ["GET", "POST"]
-    }
-});
+app.use(express.static(__dirname));
+//body parsing middleware
+app.use(helmet());
+// app.use(cors(corsOptions));
 app.use(cors({
     origin: 'http://localhost:4200'
 }));
-app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+// show log in terminal without write log into file
+app.use(morgan('combined'));
 
-const Message = mongoose.model('Message', {name: String, message: String});
-const dbUrl = 'mongodb://localhost:27017/chat-app'
 
-// app.get('/', (req, res) => {
-//     res.sendFile(__dirname + '/index.html');
-// })
-app.get('/messages', (req, res) => {
-    console.log('GET messages');
-    Message.find({}, (err, messages) => {
-        res.send(messages);
-    });
-});
-app.post('/messages', (req, res) => {
-    const message = new Message(req.body);
-    console.log('POST messages', message);
-    message.save((err) => {
-        if (err) {
-            res.sendStatus(500);
-        } else {
-            io.emit('message', req.body);
-            res.sendStatus(200);
-        }
-    });
-});
-
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    })
-});
-
-/** catch 404 and forward to error handler */
+// Route API
+// app.use("/", indexRouter);
+app.use('/api/v1/users', usersRouter);
 app.use('*', (req, res) => {
     return res.status(404).json({
         success: false,
@@ -61,11 +39,30 @@ app.use('*', (req, res) => {
     })
 });
 
-mongoose.connect(dbUrl, { useNewUrlParser: true })
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.log(err));
-
-httpServer.listen(port, () => {
-    console.log('listening on *:', httpServer.address().port);
+// Running Server on Port
+const PORT = process.env.PORT || 3000;
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+    cors: {
+        origin: "http://localhost:4200",
+        methods: ["GET", "POST"]
+    }
 });
+app.set('socketio', io);
 
+io.on('connection', function(socket){
+
+    socket.on('newRideAdded', function(exclude){
+        io.emit('newRideAdded', exclude);
+    });
+
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });
+
+});
+// io.on('connection', WebSockets.connection);
+httpServer.listen(PORT, () => {
+    console.log(`Listening on port:: http://localhost:${PORT}/`)
+});
