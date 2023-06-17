@@ -1,18 +1,18 @@
 const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
+const { createServer } = require('http');
 const { Server } = require('socket.io');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const io = new Server(server, {
+
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
     cors: {
         origin: "http://localhost:4200",
         methods: ["GET", "POST"]
     }
 });
-
 app.use(cors({
     origin: 'http://localhost:4200'
 }));
@@ -56,7 +56,7 @@ mongoose.connect(dbUrl, { useNewUrlParser: true })
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
 
-server.listen(3000, () => {
-    console.log('listening on *:', server.address().port);
+httpServer.listen(3000, () => {
+    console.log('listening on *:', httpServer.address().port);
 });
 
