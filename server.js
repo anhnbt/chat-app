@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
+const port = process.env.PORT || 3000;
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
@@ -52,11 +53,19 @@ io.on('connection', (socket) => {
     })
 });
 
+/** catch 404 and forward to error handler */
+app.use('*', (req, res) => {
+    return res.status(404).json({
+        success: false,
+        message: 'API endpoint doesnt exist'
+    })
+});
+
 mongoose.connect(dbUrl, { useNewUrlParser: true })
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
 
-httpServer.listen(3000, () => {
+httpServer.listen(port, () => {
     console.log('listening on *:', httpServer.address().port);
 });
 
